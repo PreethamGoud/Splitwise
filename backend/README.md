@@ -198,10 +198,3 @@ Run unit tests with:
 - `src/main/java/com/project/splitwise/dto` — data transfer objects
 
 ---
-
-If you want, I can also:
-- Add an OpenAPI/Swagger spec and UI for easier API exploration.
-- Provide Postman or HTTPie collection with example requests.
-- Add Dockerfile and docker-compose for local DB + app orchestration.
-
-

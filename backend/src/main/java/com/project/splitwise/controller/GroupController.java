@@ -1,6 +1,7 @@
 package com.project.splitwise.controller;
 
 import com.project.splitwise.dto.GroupDto;
+import com.project.splitwise.dto.GroupMemberDto;
 import com.project.splitwise.entity.Group;
 import com.project.splitwise.entity.User;
 import com.project.splitwise.entity.UserGroup;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/group")
@@ -33,6 +35,22 @@ public class GroupController {
 
     @Autowired
     private UserGroupService userGroupService;
+
+    @GetMapping("/{groupName}/members")
+    public ResponseEntity<?> fetchGroupMembers(@PathVariable String groupName) {
+        try {
+            Optional<Group> currGroup = groupService.findByGroupName(groupName);
+            if (currGroup.isEmpty()) throw new NullPointerException("No such group found");
+            List<GroupMemberDto> members = currGroup.get().getUsers().stream()
+                    .map(ug -> new GroupMemberDto(ug.getUser().getId(), ug.getUser().getUserName()))
+                    .collect(Collectors.toList());
+            return new ResponseEntity<>(members, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("error fetching group members", e);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
 
     @GetMapping("/{groupName}")
     public ResponseEntity<?> fetchGroupByGroupName(@PathVariable String groupName){

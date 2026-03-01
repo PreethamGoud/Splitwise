@@ -1,0 +1,97 @@
+<header class="toolbar">
+  <a mat-icon-button routerLink="/dashboard">
+    <mat-icon>arrow_back</mat-icon>
+  </a>
+  <span class="title">{{ groupName() }}</span>
+  <span class="spacer"></span>
+  <button mat-icon-button (click)="refresh()">
+    <mat-icon>refresh</mat-icon>
+  </button>
+</header>
+
+<main class="content" *ngIf="!loading() && group()">
+  <section class="actions">
+    <button mat-flat-button color="primary" (click)="openAddMember()">
+      <mat-icon>person_add</mat-icon>
+      Add member
+    </button>
+    <button mat-flat-button color="primary" (click)="openAddExpense()">
+      <mat-icon>receipt</mat-icon>
+      Add expense
+    </button>
+  </section>
+
+  <mat-tab-group>
+    <mat-tab label="Balances">
+      <mat-card>
+        <mat-card-content>
+          @if (balanceEntries().length === 0) {
+            <p class="empty">No balances yet. Add an expense to get started.</p>
+          } @else {
+            <mat-list>
+              @for (entry of balanceEntries(); track entry[0]) {
+                <mat-list-item>
+                  <span matListItemTitle>{{ entry[0] }}</span>
+                  <span matListItemLine [class.positive]="entry[1] < 0" [class.negative]="entry[1] > 0">
+                    {{ entry[1] < 0 ? 'Gets' : 'Owes' }} {{ entry[1] < 0 ? -entry[1] : entry[1] | number:'1.2-2' }}
+                  </span>
+                </mat-list-item>
+              }
+            </mat-list>
+          }
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+    <mat-tab label="Members">
+      <mat-card>
+        <mat-card-content>
+          <mat-list>
+            @for (name of group()?.userNames ?? []; track name) {
+              <mat-list-item>
+                <mat-icon matListItemIcon>person</mat-icon>
+                <span matListItemTitle>{{ name }}</span>
+              </mat-list-item>
+            }
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+    <mat-tab label="Settle up">
+      <mat-card>
+        <mat-card-content>
+          <p class="section-desc">Suggested settlements to simplify debts in this group.</p>
+          @if (suggestedSettlements().length === 0) {
+            <p class="empty">No settlements needed. Balances are clear.</p>
+          } @else {
+            <mat-list>
+              @for (tx of suggestedSettlements(); track tx.paidFrom + tx.paidTo + tx.amount) {
+                <mat-list-item>
+                  <span matListItemTitle>{{ tx.paidFrom }} → {{ tx.paidTo }}</span>
+                  <span matListItemLine>{{ tx.amount | number:'1.2-2' }}</span>
+                  <button mat-icon-button (click)="openRecordSettlement(tx)" matListItemMeta>
+                    <mat-icon>check_circle</mat-icon>
+                  </button>
+                </mat-list-item>
+              }
+            </mat-list>
+          }
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
+  </mat-tab-group>
+</main>
+
+@if (loading()) {
+  <div class="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+}
+
+@if (error() && !loading()) {
+  <mat-card class="error-card">
+    <mat-card-content>
+      <p>{{ error() }}</p>
+      <button mat-button routerLink="/dashboard">Back to Dashboard</button>
+    </mat-card-content>
+  </mat-card>
+}

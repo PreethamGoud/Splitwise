@@ -1,0 +1,44 @@
+.full-width {
+  width: 100%;
+  display: block;
+}
+
+mat-dialog-content {
+  min-width: 480px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0 0 0.5rem 0;
+}
+
+.participants {
+  margin-top: 1rem;
+}
+
+.participant-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+
+  .member-name {
+    min-width: 100px;
+    font-weight: 500;
+  }
+  .paid {
+    width: 90px;
+  }
+  .owed, .pct {
+    width: 80px;
+  }
+}
+
+h3 {
+  margin: 1rem 0 0.5rem 0;
+  font-size: 1rem;
+}
