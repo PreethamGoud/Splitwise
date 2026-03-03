@@ -124,10 +124,11 @@ export class ApiService {
   recordSettlement(
     groupName: string,
     body: SettleUpDto,
-  ): Observable<string | UserDtoOrError> {
-    return this.http.post<string | UserDtoOrError>(
+  ): Observable<string> {
+    return this.http.post(
       `${this.base}/settle/group/${encodeURIComponent(groupName)}`,
       body,
+      { responseType: 'text' },
     );
   }
 }

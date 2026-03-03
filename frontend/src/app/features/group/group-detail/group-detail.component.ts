@@ -171,63 +171,29 @@ export class GroupDetailComponent implements OnInit {
   openRecordSettlement(tx: SettleUpDto): void {
     const name = this.groupName();
     if (!name) return;
-    console.log('opening record-settlement dialog', name, tx);
     const ref = this.dialog.open(RecordSettlementDialogComponent, {
       width: '400px',
       data: { groupName: name, transaction: tx },
     });
-    ref.afterClosed().subscribe({
-      next: (recorded: boolean) => {
-        console.log('record-settlement dialog closed, result=', recorded);
-        if (recorded) {
-          this.snackBar.open('Settlement recorded', 'Close', {
-            duration: 2000,
-          });
-          this.loadBalance(name);
-          this.loadSuggestedSettlements(name);
-        }
-      },
-      error: (err) => {
-        console.error('dialog afterClosed error', err);
-        this.snackBar.open(
-          'An error occurred closing settlement dialog',
-          'Close',
-          {
-            duration: 4000,
-          },
-        );
-      },
+    ref.afterClosed().subscribe((recorded: boolean) => {
+      if (recorded) {
+        this.recordSettlement(tx);
+      }
     });
   }
 
   recordSettlement(tx: SettleUpDto): void {
     const name = this.groupName();
     if (!name) return;
-    console.log('recordSettlement request', name, tx);
     this.api.recordSettlement(name, tx).subscribe({
       next: (res) => {
-        console.log('recordSettlement response', res);
-        // support string, {message}, {success:boolean, message?}
-        let msg = 'Done';
-        let ok = true;
-        if (typeof res === 'string') {
-          msg = res;
-        } else if (res && typeof res === 'object') {
-          if ('message' in res && res.message) {
-            msg = res.message;
-          }
-          if ('success' in res && res.success === false) {
-            ok = false;
-          }
-        }
-        this.snackBar.open(msg, 'Close', { duration: 2000 });
-        if (ok) {
-          this.loadBalance(name);
-          this.loadSuggestedSettlements(name);
-        }
+        this.snackBar.open(res || 'Settlement recorded', 'Close', {
+          duration: 2000,
+        });
+        this.loadBalance(name);
+        this.loadSuggestedSettlements(name);
       },
       error: (err) => {
-        console.error('recordSettlement error', err);
         this.snackBar.open(
           err?.error?.message ?? 'Failed to record settlement',
           'Close',
