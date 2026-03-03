@@ -1,6 +1,5 @@
 package com.project.splitwise.service;
 
-//ye bnaya h spring security ke liye bs
 //config -> SpringSecurity me use kia h ise
 
 //How It Works in Spring Security

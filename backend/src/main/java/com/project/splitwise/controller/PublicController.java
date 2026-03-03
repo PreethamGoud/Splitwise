@@ -78,16 +78,10 @@ public class PublicController {
         }
     }
 
-    //jwt token generate krdega if userName and pass sahi hue to
     @PostMapping("/login")  //user creation public rehna chahiye
     public ResponseEntity<String> login(@RequestBody User newUser){
         try {
-            //to authenticate user using UserDetailsServiceImplementaion and spring security
-            //agr userName,password match nhi hua to yahi pr error ajaega and catch me chle jaenge
-            //spring security me authenticationManagerBean() function bnaya h iske liye
-            // /public end point secure nhi h isliye alg se verification krni pdi hume user ki yaha
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(newUser.getUserName() , newUser.getPassword()));
-            //authenticated user ki details lakr dedo
             UserDetails userDetails = userDetailsServiceImplementaion.loadUserByUsername(newUser.getUserName());
             //generate token
             String jwt = jwtUtil.generateToken(userDetails.getUsername());
@@ -129,7 +123,6 @@ public class PublicController {
                 String email = (String) userInfo.get("email");
                 UserDetails userDetails = null;
                 try{
-                    //agr user hua to userDetails ajaegi vrna catch me jakr user save kradenge
                     userDetails = userDetailsService.loadUserByUsername(email);
                 }catch (Exception e){
                     User user = new User();

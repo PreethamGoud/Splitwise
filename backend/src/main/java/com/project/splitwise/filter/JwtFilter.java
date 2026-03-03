@@ -31,7 +31,6 @@ public class JwtFilter  extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        //Authorization header nikal lo
         String authorizationHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
@@ -45,7 +44,6 @@ public class JwtFilter  extends OncePerRequestFilter {
             if (jwtUtil.validateToken(jwt)){
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                //yaha authentication set kr rhe h or baki sb secure end points pr authentication get kr rhe h
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         }
