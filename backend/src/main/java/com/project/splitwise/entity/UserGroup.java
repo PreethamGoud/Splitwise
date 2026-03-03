@@ -13,6 +13,7 @@ public class UserGroup {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+//    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.REFRESH})
     @ManyToOne
     private User user;
 

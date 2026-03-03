@@ -108,7 +108,6 @@ public class GroupController {
             //if user already exists in group,throw error
             Optional<UserGroup> isCurrUserGroupPresent = userGroupService.findByGroupIdAndUserId(currGroup.get().getId(),currUser.get().getId());
             if(!isCurrUserGroupPresent.isEmpty())throw new IllegalArgumentException("User already exists in group");
-
             //add user and group to the userGroup
             UserGroup currUserGroup = new UserGroup();
             currUserGroup.setGroup(currGroup.get());
@@ -118,12 +117,11 @@ public class GroupController {
 
             if(savedUserGroup == null)throw new RuntimeException("Error in creating userGroup");
 
+
             //add userGroup in user and group and save them
             currGroup.get().getUsers().add(savedUserGroup);
             currUser.get().getGroups().add(savedUserGroup);
 
-            User savedUser = userService.saveUser(currUser.get());
-            Group savedGroup = groupService.saveGroup(currGroup.get());
 
             return new ResponseEntity<>("User added successfully!",HttpStatus.OK);
         }
