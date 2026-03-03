@@ -14,7 +14,7 @@ import { AuthService } from '../../core/services/auth.service';
 import { ApiService } from '../../core/services/api.service';
 import { CreateGroupDialogComponent } from './create-group-dialog/create-group-dialog.component';
 import type { UserDto } from '../../models/user.model';
-import type { GroupDto } from '../../models/group.model';
+import type { AllGroupsSettledDto } from '../../models/settlement.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -36,16 +36,28 @@ import type { GroupDto } from '../../models/group.model';
 })
 export class DashboardComponent implements OnInit {
   user = signal<UserDto | null>(null);
-  balanceAll = signal<Record<string, number> | null>(null);
-  settledAll = signal<{ paidFrom: string; paidTo: string; amount: number }[] | null>(null);
+  settledAll = signal<AllGroupsSettledDto | null>(null);
   loading = signal(true);
   balanceError = signal<string | null>(null);
 
   groups = computed(() => this.user()?.groups ?? []);
   balanceEntries = computed(() => {
-    const b = this.balanceAll();
-    if (!b) return [];
-    return Object.entries(b).filter(([, v]) => v !== 0);
+    const settled = this.settledAll();
+    const me = this.user()?.userName ?? this.auth.currentUser()?.userName;
+    if (!settled || !me) return [];
+
+    return settled.shareWithFriends
+      .filter((x) => x.totalAmount !== 0)
+      .map((x) => {
+        const isMePaidFrom = x.paidFrom.localeCompare(me, undefined, { sensitivity: 'accent' }) === 0;
+        const friend = isMePaidFrom ? x.paidTo : x.paidFrom;
+        return {
+          friend,
+          youOwe: x.totalAmount < 0,
+          amount: Math.abs(x.totalAmount),
+        };
+      })
+      .sort((a, b) => a.friend.localeCompare(b.friend));
   });
 
   constructor(
@@ -61,10 +73,10 @@ export class DashboardComponent implements OnInit {
         this.user.set(res as UserDto);
       }
     });
-    this.api.getBalanceAll().subscribe({
+    this.api.getAllSettledUser().subscribe({
       next: (res) => {
         if (res && typeof res === 'object' && !('message' in res)) {
-          this.balanceAll.set(res as Record<string, number>);
+          this.settledAll.set(res as AllGroupsSettledDto);
         } else if (res && typeof res === 'object' && 'message' in res) {
           this.balanceError.set((res as { message: string }).message);
         }
@@ -73,13 +85,6 @@ export class DashboardComponent implements OnInit {
       error: (err) => {
         this.balanceError.set(err?.error?.message ?? 'Failed to load balances');
         this.loading.set(false);
-      },
-    });
-    this.api.getSettledBalanceAll().subscribe({
-      next: (res) => {
-        if (Array.isArray(res)) {
-          this.settledAll.set(res);
-        }
       },
     });
   }

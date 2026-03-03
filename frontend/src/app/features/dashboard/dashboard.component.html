@@ -28,11 +28,16 @@
     <mat-card>
       <mat-card-content>
         <mat-list>
-          @for (entry of balanceEntries(); track entry[0]) {
+          @for (entry of balanceEntries(); track entry.friend) {
             <mat-list-item>
-              <span matListItemTitle>{{ entry[0] }}</span>
-              <span matListItemLine [class.you-owe]="entry[1] > 0" [class.owes-you]="entry[1] < 0">
-                {{ entry[1] > 0 ? 'You owe' : 'Owes you' }} {{ entry[1] < 0 ? -entry[1] : entry[1] | number:'1.2-2' }}
+              <span matListItemTitle>{{ entry.friend }}</span>
+              <span
+                matListItemLine
+                [class.you-owe]="entry.youOwe"
+                [class.owes-you]="!entry.youOwe"
+              >
+                {{ entry.youOwe ? 'You owe' : 'Owes you' }}
+                {{ entry.amount | number:'1.2-2' }}
               </span>
             </mat-list-item>
           }
