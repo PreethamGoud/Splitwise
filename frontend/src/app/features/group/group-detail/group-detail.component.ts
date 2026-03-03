@@ -53,7 +53,7 @@ export class GroupDetailComponent implements OnInit {
     public auth: AuthService,
     private api: ApiService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
   ) {}
 
   ngOnInit(): void {
@@ -121,18 +121,25 @@ export class GroupDetailComponent implements OnInit {
     });
     ref.afterClosed().subscribe((userName?: string) => {
       if (!userName) return;
+
       this.api.addUserToGroup(name, userName).subscribe({
         next: (res) => {
           if (typeof res === 'string') {
             this.snackBar.open(res, 'Close', { duration: 2000 });
           } else if (res && typeof res === 'object' && 'message' in res) {
-            this.snackBar.open((res as { message: string }).message, 'Close', { duration: 4000 });
+            const msg = (res as { message: string }).message;
+            this.snackBar.open(msg, 'Close', { duration: 4000 });
             return;
           }
           this.loadGroup(name);
         },
         error: (err) => {
-          this.snackBar.open(err?.error?.message ?? 'Failed to add member', 'Close', { duration: 4000 });
+          console.error('addUserToGroup error', err);
+          this.snackBar.open(
+            err?.error?.message ?? 'Failed to add member',
+            'Close',
+            { duration: 4000 },
+          );
         },
       });
     });
@@ -182,13 +189,20 @@ export class GroupDetailComponent implements OnInit {
     if (!name) return;
     this.api.recordSettlement(name, tx).subscribe({
       next: (res) => {
-        const msg = typeof res === 'string' ? res : (res as { message?: string })?.message ?? 'Done';
+        const msg =
+          typeof res === 'string'
+            ? res
+            : ((res as { message?: string })?.message ?? 'Done');
         this.snackBar.open(msg, 'Close', { duration: 2000 });
         this.loadBalance(name);
         this.loadSuggestedSettlements(name);
       },
       error: (err) => {
-        this.snackBar.open(err?.error?.message ?? 'Failed to record settlement', 'Close', { duration: 4000 });
+        this.snackBar.open(
+          err?.error?.message ?? 'Failed to record settlement',
+          'Close',
+          { duration: 4000 },
+        );
       },
     });
   }
