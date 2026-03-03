@@ -3,6 +3,7 @@ package com.project.splitwise.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -13,6 +14,7 @@ import java.util.Date;
 @Getter
 @Setter
 @ToString(exclude = {"payer", "receiver","group"})
+@NoArgsConstructor
 public class Settlement {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

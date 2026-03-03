@@ -37,4 +37,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     int updateExpenseStatusToPartiallySettledForGroup(
             @Param("groupName") String groupName
     );
+
+    List<Expense> findByGroup_GroupNameOrderByDateDesc(String groupName);
 }

@@ -17,6 +17,7 @@ import { AddExpenseDialogComponent } from '../add-expense-dialog/add-expense-dia
 import { RecordSettlementDialogComponent } from '../record-settlement-dialog/record-settlement-dialog.component';
 import type { GroupDto } from '../../../models/group.model';
 import type { SettleUpDto } from '../../../models/settlement.model';
+import type { GroupTransactionDto } from '../../../models/group-transaction.model';
 
 @Component({
   selector: 'app-group-detail',
@@ -40,6 +41,7 @@ export class GroupDetailComponent implements OnInit {
   group = signal<GroupDto | null>(null);
   balance = signal<Record<string, number>>({});
   suggestedSettlements = signal<SettleUpDto[]>([]);
+  transactions = signal<GroupTransactionDto[]>([]);
   loading = signal(true);
   error = signal<string | null>(null);
 
@@ -64,6 +66,7 @@ export class GroupDetailComponent implements OnInit {
         this.loadGroup(name);
         this.loadBalance(name);
         this.loadSuggestedSettlements(name);
+        this.loadTransactions(name);
       }
     });
   }
@@ -103,12 +106,31 @@ export class GroupDetailComponent implements OnInit {
     });
   }
 
+  private loadTransactions(name: string): void {
+    this.api.getGroupTimeline(name).subscribe({
+      next: (res) => {
+        if (Array.isArray(res)) {
+          this.transactions.set(res as GroupTransactionDto[]);
+        }
+      },
+      error: (err) => {
+        const raw = err?.error;
+        const msg =
+          (typeof raw === 'string'
+            ? raw
+            : raw?.message) ?? 'Failed to load transactions';
+        this.snackBar.open(msg, 'Close', { duration: 4000 });
+      },
+    });
+  }
+
   refresh(): void {
     const name = this.groupName();
     if (name) {
       this.loadGroup(name);
       this.loadBalance(name);
       this.loadSuggestedSettlements(name);
+      this.loadTransactions(name);
     }
   }
 

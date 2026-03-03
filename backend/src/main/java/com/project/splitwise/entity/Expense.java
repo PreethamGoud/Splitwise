@@ -3,6 +3,7 @@ package com.project.splitwise.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 @Getter
 @Setter
 @ToString(exclude = {"shares"})
+@NoArgsConstructor
 public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +42,7 @@ public class Expense {
     @OneToMany(mappedBy = "expense", cascade = CascadeType.ALL)
     private List<ExpenseShare> shares = new ArrayList<>();
 
-    // Constructors, getters, setters
+    // Convenience constructor used when creating a new expense
     public Expense(String a,BigDecimal b,Date c,ExpenseStatus d,SplitType e,User f,Group g){
         this.description = a;
         this.amount = b;

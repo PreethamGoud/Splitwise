@@ -9,6 +9,7 @@ import type {
   SettleUpDto,
   AllGroupsSettledDto,
 } from '../../models/settlement.model';
+import type { GroupTransactionDto } from '../../models/group-transaction.model';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -129,6 +130,14 @@ export class ApiService {
       `${this.base}/settle/group/${encodeURIComponent(groupName)}`,
       body,
       { responseType: 'text' },
+    );
+  }
+
+  getGroupTimeline(
+    groupName: string,
+  ): Observable<GroupTransactionDto[] | UserDtoOrError> {
+    return this.http.get<GroupTransactionDto[] | UserDtoOrError>(
+      `${this.base}/settle/group/${encodeURIComponent(groupName)}/timeline`,
     );
   }
 }

@@ -78,6 +78,38 @@
         </mat-card-content>
       </mat-card>
     </mat-tab>
+    <mat-tab label="Transactions">
+      <mat-card>
+        <mat-card-content>
+          <p class="section-desc">
+            All expenses and settlements in this group, newest first.
+          </p>
+          @if (transactions().length === 0) {
+            <p class="empty">No transactions yet.</p>
+          } @else {
+            <mat-list>
+              @for (tx of transactions(); track tx.type + tx.date + tx.description + (tx.paidFrom ?? '') + (tx.paidTo ?? '')) {
+                <mat-list-item>
+                  <div matListItemTitle>
+                    <span class="tx-type">{{ tx.type === 'EXPENSE' ? 'Expense' : 'Settlement' }}</span>
+                    ·
+                    <span>{{ tx.date | date: 'mediumDate' }}</span>
+                  </div>
+                  <div matListItemLine>
+                    <span *ngIf="tx.type === 'EXPENSE'">
+                      {{ tx.paidFrom }} paid {{ tx.amount | number:'1.2-2' }} — {{ tx.description }}
+                    </span>
+                    <span *ngIf="tx.type === 'SETTLEMENT'">
+                      {{ tx.paidFrom }} → {{ tx.paidTo }} &nbsp; {{ tx.amount | number:'1.2-2' }} — {{ tx.description }}
+                    </span>
+                  </div>
+                </mat-list-item>
+              }
+            </mat-list>
+          }
+        </mat-card-content>
+      </mat-card>
+    </mat-tab>
   </mat-tab-group>
 </main>
 
